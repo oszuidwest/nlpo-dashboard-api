@@ -1,16 +1,16 @@
-# NLPO API Endpoint voor WordPress
+# NLPO Dashboard endpoint voor WordPress
 
-Deze WordPress plugin implementeert een beveiligde REST API endpoint voor het aanleveren van artikeldata aan het NLPO dashboard. Omdat het dashboard standaard geen Plausible analytics ondersteunt, heeft Streekomroep ZuidWest zijn eigen implementatie geschreven. 
+Deze WordPress plugin implementeert een REST API endpoint voor het aanleveren van artikeldata aan het NLPO Dashboard. Omdat het dashboard standaard geen Plausible analytics ondersteunt, heeft Streekomroep ZuidWest een alternatieve implementatie geschreven. 
 
 ## Over deze plugin
 
-De plugin voegt een REST API endpoint toe aan je WordPress website die artikelgegevens volgens de NLPO specificaties beschikbaar stelt. De plugin haalt naast de standaard WordPress gegevens ook de paginaweergaven uit Plausible Analytics op en combineert deze tot één gestandaardiseerde output. Deze data wordt door het NLPO dashboard gebruikt om statistieken en inzichten te genereren over het bereik van lokale/streekomroepen.
+De plugin voegt een REST API endpoint toe aan WordPress die artikelgegevens volgens de specificaties van het NLPO Dashboard beschikbaar stelt. De plugin haalt alle gepubliceerde aritkelen van het type post en de paginaweergaven van die artikelen uit Plausible Analytics. Vervolgens combineert deze het geheel tot één gestandaardiseerde output. Deze data wordt in het NLPO Dashboard gebruikt voor het rapporteren van het bereik van lokale/streekomroepen.
 
 ## Installatie
 
-1. Download de plugin bestanden en plaats deze in je `/wp-content/plugins/nlpo-api/` map
-2. Activeer de plugin via de WordPress beheeromgeving
-3. Configureer de vereiste instellingen in het plugin bestand:
+1. Download de pluginbestanden en plaats deze in `/wp-content/plugins/nlpo-api/`
+2. Activeer de plugin via WordPress 
+3. Configureer de vereiste instellingen in het plugin-bestand:
    ```php
    define('NLPO_PLAUSIBLE_BASE_URL', 'jouw-plausible-url/api');
    define('NLPO_PLAUSIBLE_SITE_ID', 'jouw-site-id');
@@ -22,8 +22,8 @@ De plugin voegt een REST API endpoint toe aan je WordPress website die artikelge
 
 Voor de werking van de plugin heb je de volgende gegevens nodig:
 
-- `NLPO_PLAUSIBLE_BASE_URL`: De basis URL van je Plausible Analytics installatie
-- `NLPO_PLAUSIBLE_SITE_ID`: Je website ID in Plausible Analytics
+- `NLPO_PLAUSIBLE_BASE_URL`: De URL van je Plausible Analytics installatie
+- `NLPO_PLAUSIBLE_SITE_ID`: Het website ID in Plausible Analytics
 - `NLPO_PLAUSIBLE_TOKEN`: Een Plausible Analytics API token met leestoegang
 - `NLPO_API_TOKEN`: Een zelf gekozen beveiligingstoken voor de API toegang
 - `NLPO_CACHE_EXPIRATION`: Hoe lang statistieken gecacht worden in seconden (standaard: 3600)
@@ -64,7 +64,10 @@ Parameters:
 - `from` (optioneel): Startdatum (YYYY-MM-DD)
 - `to` (optioneel): Einddatum (YYYY-MM-DD)
 
-Zonder datums worden artikelen van de laatste 7 dagen teruggegeven. Standaard wordt data uit Plausible Analytics een uur gecached om hammering van de de service te voorkomen. 
+Zonder datums worden artikelen van de laatste 7 dagen teruggegeven. Standaard wordt data uit Plausible Analytics een uur gecached om hammering van de de service te voorkomen.
+
+## Beperkingen
+De `comment_count` is altijd 0. Omdat ZuidWest niet met reacties werkt. Ook worden de tags standaard gevuld met de `regio` taxonomie uit WordPress. Dit omdat ZuidWest geen tags gebruikt, maar een custom taxonomie voor regio's.
 
 ## Licentie
 
