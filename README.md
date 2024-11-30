@@ -1,6 +1,6 @@
-# NLPO Dashboard WordPress Plugin
+# NLPO API Endpoint voor WordPress
 
-Deze WordPress plugin implementeert een beveiligde REST API endpoint voor het aanleveren van artikeldata aan het NLPO dashboard. Omdat het dashboard standaard geen Plausible analytics ondersteunt, heeft Streekomroep ZuidWest zijn eigen implementatie geschreven.
+Deze WordPress plugin implementeert een beveiligde REST API endpoint voor het aanleveren van artikeldata aan het NLPO dashboard. Omdat het dashboard standaard geen Plausible analytics ondersteunt, heeft Streekomroep ZuidWest zijn eigen implementatie geschreven. 
 
 ## Over deze plugin
 
@@ -50,6 +50,8 @@ De plugin levert artikeldata aan in het door NLPO gespecificeerde formaat:
 ]
 ```
 
+Deze implementatie-details zijn gebruikt: https://www.nlpo.nl/wp-content/uploads/2024/07/240711-PRD-_-Custom_API-v2-.pdf
+
 ## Technische informatie
 
 Het endpoint is beschikbaar op:
@@ -62,7 +64,7 @@ Parameters:
 - `from` (optioneel): Startdatum (YYYY-MM-DD)
 - `to` (optioneel): Einddatum (YYYY-MM-DD)
 
-Zonder datums worden artikelen van de laatste 7 dagen teruggegeven.
+Zonder datums worden artikelen van de laatste 7 dagen teruggegeven. Standaard wordt data uit Plausible Analytics een uur gecached om hammering van de de service te voorkomen. 
 
 ## Licentie
 

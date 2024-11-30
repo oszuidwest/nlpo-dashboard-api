@@ -1,7 +1,7 @@
 <?php
 /**
  * Plugin Name: NLPO API Endpoint
- * Description: Implementeert een custom API endpoint voor artikelen volgens NLPO specificaties met Plausible Analytics integratie
+ * Description: Implementeert een custom API endpoint voor het aanleveren van artikelen en traffic voor het NLPO Dashboard
  * Version: 0.0.3
  * Author: Raymon Mens
  * 
