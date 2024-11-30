@@ -80,7 +80,7 @@ class NLPO_API {
     
     /**
      * Haalt artikelen op gebaseerd op de request parameters
-     * Bij fouten wordt een 500 error teruggegeven
+     * Geeft 400 error bij ongeldige datums, 500 bij interne fouten
      * 
      * @param WP_REST_Request $request Het REST API request object
      * @return WP_REST_Response Response met artikelen of error bij problemen
@@ -89,6 +89,14 @@ class NLPO_API {
         try {
             $from_date = $request->get_param('from') ?: date('Y-m-d', strtotime('-7 days'));
             $to_date = $request->get_param('to') ?: date('Y-m-d');
+            
+            // Valideer dat from_date voor to_date ligt
+            if (strtotime($from_date) > strtotime($to_date)) {
+                return new WP_REST_Response(
+                    ['error' => 'From date must be before or equal to to date'],
+                    400
+                );
+            }
             
             $posts = $this->get_posts($from_date, $to_date);
             $articles = array_map([$this, 'format_article'], $posts);
