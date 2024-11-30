@@ -65,8 +65,6 @@ class NLPO_API {
                 urlencode($page_path)
             );
 
-            error_log('Plausible API URL: ' . $url); // Debug log
-
             $response = wp_remote_get($url, array(
                 'headers' => array(
                     'Authorization' => 'Bearer ' . $this->plausible_token
