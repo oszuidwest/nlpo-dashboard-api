@@ -2,16 +2,14 @@
 /**
  * Plugin Name: NLPO API Endpoint
  * Description: Implementeert een custom API endpoint voor artikelen volgens NLPO specificaties met Plausible Analytics integratie
- * Version: 0.0.2
+ * Version: 0.0.3
  * Author: Raymon Mens
- * 
- * Deze plugin biedt een REST API endpoint dat artikelen levert volgens de NLPO specificaties.
- * Het endpoint integreert met Plausible Analytics om pageview statistieken toe te voegen.
  * 
  * Endpoint: /wp-json/zw/v1/nlpo
  * Parameters:
- * - from: Start datum (YYYY-MM-DD)
- * - to: Eind datum (YYYY-MM-DD)
+ * - from: Startdatum (YYYY-MM-DD)
+ * - to: Einddatum (YYYY-MM-DD)
+ * - token: API authenticatie token (verplicht)
  */
 
 // Prevent direct access to this file
@@ -20,24 +18,27 @@ if (!defined('ABSPATH')) {
 }
 
 /**
- * Plugin configuratie
- * Pas deze waardes aan voor verschillende omgevingen
+ * Plugin configuratie constanten
+ * Deze waardes dienen aangepast te worden voor verschillende omgevingen
  */
 define('NLPO_PLAUSIBLE_BASE_URL', 'https://stats.zuidwesttv.nl/api');
 define('NLPO_PLAUSIBLE_SITE_ID', 'zuidwestupdate.nl');
-define('NLPO_PLAUSIBLE_TOKEN', 'aaa'); // Vervang door echte token
+define('NLPO_PLAUSIBLE_TOKEN', 'PLAUSIBLE-API-KEY-HIER');
 define('NLPO_CACHE_EXPIRATION', 3600); // Cacheduur in seconden
+define('NLPO_API_TOKEN', 'HELE-VEILIGE-TOKEN-HIER'); // Dit is de token die het endpoint beveiligt zodat niet iedereen met de data aan de haal kan
 
 /**
  * Main klasse voor de NLPO API functionaliteit
- * Handelt de registratie van endpoints en artikelverwerking af
+ * 
+ * Deze klasse implementeert een beveiligde REST API endpoint voor het ophalen van
+ * artikelen volgens NLPO specificaties, inclusief pageviews uit Plausible Analytics.
  */
 class NLPO_API {
-    /** @var NLPO_Analytics_Service */
+    /** @var NLPO_Analytics_Service Instance van de analytics service */
     private $analytics;
     
     /**
-     * Initialiseert de plugin en registreert de nodige hooks
+     * Constructor: initialiseert de plugin en registreert de nodige hooks
      */
     public function __construct() {
         $this->analytics = new NLPO_Analytics_Service();
@@ -45,22 +46,61 @@ class NLPO_API {
     }
     
     /**
-     * Registreert het REST API endpoint
+     * Registreert het REST API endpoint met token authenticatie
      */
     public function register_endpoints() {
         register_rest_route('zw/v1', '/nlpo', [
             'methods' => 'GET',
             'callback' => [$this, 'get_articles'],
-            'permission_callback' => '__return_true',
+            'permission_callback' => [$this, 'verify_token'],
             'args' => [
                 'from' => [
-                    'validate_callback' => [$this, 'validate_date']
+                    'required' => false,
+                    'validate_callback' => [$this, 'validate_date'],
+                    'description' => 'Startdatum in YYYY-MM-DD formaat'
                 ],
                 'to' => [
-                    'validate_callback' => [$this, 'validate_date']
+                    'required' => false,
+                    'validate_callback' => [$this, 'validate_date'],
+                    'description' => 'Einddatum in YYYY-MM-DD formaat'
+                ],
+                'token' => [
+                    'required' => true,
+                    'validate_callback' => function($param) {
+                        return is_string($param) && !empty($param);
+                    },
+                    'description' => 'API authenticatie token'
                 ]
             ]
         ]);
+    }
+
+    /**
+     * Verifieert de API token voor toegangscontrole
+     * 
+     * @param WP_REST_Request $request Het REST API request object
+     * @return bool|WP_Error True bij geldige token, WP_Error bij ongeldige of ontbrekende token
+     */
+    public function verify_token($request) {
+        $token = $request->get_param('token');
+        
+        if (!defined('NLPO_API_TOKEN') || empty(NLPO_API_TOKEN)) {
+            return new WP_Error(
+                'rest_token_not_configured',
+                'API token niet geconfigureerd',
+                ['status' => 500]
+            );
+        }
+
+        if ($token !== NLPO_API_TOKEN) {
+            return new WP_Error(
+                'rest_invalid_token',
+                'Ongeldige API token',
+                ['status' => 401]
+            );
+        }
+
+        return true;
     }
 
     /**
@@ -80,10 +120,9 @@ class NLPO_API {
     
     /**
      * Haalt artikelen op gebaseerd op de request parameters
-     * Geeft 400 error bij ongeldige datums, 500 bij interne fouten
      * 
      * @param WP_REST_Request $request Het REST API request object
-     * @return WP_REST_Response Response met artikelen of error bij problemen
+     * @return WP_REST_Response|WP_Error Response met artikelen of error bij problemen
      */
     public function get_articles($request) {
         try {
@@ -92,29 +131,31 @@ class NLPO_API {
             
             // Valideer dat from_date voor to_date ligt
             if (strtotime($from_date) > strtotime($to_date)) {
-                return new WP_REST_Response(
-                    ['error' => 'From date must be before or equal to to date'],
-                    400
+                return new WP_Error(
+                    'rest_invalid_date_range',
+                    'From datum moet voor of gelijk zijn aan to datum',
+                    ['status' => 400]
                 );
             }
             
             $posts = $this->get_posts($from_date, $to_date);
             $articles = array_map([$this, 'format_article'], $posts);
             
-            return new WP_REST_Response($articles, 200);
+            return rest_ensure_response($articles);
             
         } catch (Exception $e) {
             error_log('[NLPO API] Error in get_articles: ' . $e->getMessage());
             
-            return new WP_REST_Response(
-                ['error' => 'Internal server error'],
-                500
+            return new WP_Error(
+                'rest_api_error',
+                'Interne server fout',
+                ['status' => 500]
             );
         }
     }
     
     /**
-     * Haalt posts op voor het gegeven datumbereik
+     * Haalt WordPress posts op voor het gegeven datumbereik
      * 
      * @param string $from_date Start datum
      * @param string $to_date Eind datum
@@ -138,10 +179,10 @@ class NLPO_API {
     }
     
     /**
-     * Schrijf een WordPress post om naar het NLPO artikel formaat
+     * Formatteert een WordPress post naar het NLPO artikel formaat
      * 
-     * @param WP_Post $post Het post object
-     * @return array Geformatteerd artikel
+     * @param WP_Post $post Het WordPress post object
+     * @return array Geformatteerd artikel volgens NLPO specificaties
      * @throws Exception bij fouten in de Plausible API
      */
     private function format_article($post) {
@@ -171,12 +212,13 @@ class NLPO_API {
 
 /**
  * Service klasse voor Plausible Analytics integratie
- * Handelt de API calls en caching af
+ * 
+ * Deze klasse handelt alle interacties met de Plausible Analytics API af,
+ * inclusief caching van resultaten voor betere performance.
  */
 class NLPO_Analytics_Service {
     /**
      * Haalt pageviews op voor een specifieke pagina
-     * Throws exception bij API fouten voor 500 error afhandeling
      * 
      * @param string $page_path Het pad van de pagina
      * @return int Aantal pageviews
@@ -199,16 +241,16 @@ class NLPO_Analytics_Service {
             
         } catch (Exception $e) {
             error_log(sprintf(
-                '[NLPO API] Plausible Analytics error for %s: %s',
+                '[NLPO API] Plausible Analytics fout voor %s: %s',
                 $page_path,
                 $e->getMessage()
             ));
-            throw $e; // Propagate error up voor 500 response
+            throw $e;
         }
     }
     
     /**
-     * Maakt een API request naar Plausible
+     * Maakt een API request naar Plausible Analytics
      * 
      * @param string $page_path Het pad van de pagina
      * @return array De API response
@@ -216,7 +258,7 @@ class NLPO_Analytics_Service {
      */
     private function make_api_request($page_path) {
         if (empty(NLPO_PLAUSIBLE_TOKEN)) {
-            throw new Exception('Plausible API token not configured');
+            throw new Exception('Plausible API token niet geconfigureerd');
         }
         
         $url = sprintf(
@@ -236,7 +278,7 @@ class NLPO_Analytics_Service {
         ]);
         
         if (is_wp_error($response)) {
-            throw new Exception('Plausible API request failed: ' . $response->get_error_message());
+            throw new Exception('Plausible API request mislukt: ' . $response->get_error_message());
         }
         
         $response_code = wp_remote_retrieve_response_code($response);
@@ -244,9 +286,9 @@ class NLPO_Analytics_Service {
         
         if ($response_code !== 200) {
             $error_data = json_decode($body, true);
-            $error_message = isset($error_data['error']) ? $error_data['error'] : 'Unknown error';
+            $error_message = isset($error_data['error']) ? $error_data['error'] : 'Onbekende fout';
             throw new Exception(sprintf(
-                'Plausible API returned %d: %s', 
+                'Plausible API gaf %d: %s', 
                 $response_code,
                 $error_message
             ));
@@ -265,29 +307,35 @@ class NLPO_Analytics_Service {
     private function process_response($response) {
         $body = wp_remote_retrieve_body($response);
         if (empty($body)) {
-            throw new Exception('Empty response from Plausible API');
+            throw new Exception('Lege response van Plausible API');
         }
         
         $data = json_decode($body, true);
         if (json_last_error() !== JSON_ERROR_NONE) {
-            throw new Exception('Invalid JSON response from Plausible API: ' . json_last_error_msg());
+            throw new Exception('Ongeldige JSON response van Plausible API: ' . json_last_error_msg());
         }
         
         if (!isset($data['results']['pageviews']['value'])) {
-            throw new Exception('Unexpected response format from Plausible API');
+            throw new Exception('Onverwacht response formaat van Plausible API');
         }
         
         return $data['results']['pageviews']['value'];
     }
 }
 
-// Draai de plugin
+// Initialiseer de plugin
 new NLPO_API();
 
+/**
+ * Plugin activatie hook: ververst de rewrite rules
+ */
 register_activation_hook(__FILE__, function() {
     flush_rewrite_rules();
 });
 
+/**
+ * Plugin deactivatie hook: ververst de rewrite rules
+ */
 register_deactivation_hook(__FILE__, function() {
     flush_rewrite_rules();
 });
