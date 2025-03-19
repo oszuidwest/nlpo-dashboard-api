@@ -3,7 +3,7 @@
  * Plugin Name: NLPO API Endpoint
  * Description: Implementeert een custom API endpoint voor het aanleveren van artikelen en traffic voor het NLPO Dashboard
  * Version: 0.0.4
- * Author: Raymon Mens
+ * Author: Streekomroep ZuidWest
  * 
  * Endpoint: /wp-json/zw/v1/nlpo
  * Parameters:

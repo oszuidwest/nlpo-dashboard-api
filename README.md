@@ -1,10 +1,10 @@
 # NLPO Dashboard endpoint voor WordPress
 
-Deze WordPress plugin implementeert een REST API endpoint voor het aanleveren van artikeldata aan het NLPO Dashboard. Omdat het dashboard standaard geen Plausible analytics ondersteunt, heeft Streekomroep ZuidWest een alternatieve implementatie geschreven. 
+Deze WordPress plugin implementeert een REST API endpoint voor het aanleveren van artikeldata aan het [NLPO Bereiksdashboard](https://www.nlpo.nl/dashboard/). Omdat het dashboard standaard geen Plausible analytics ondersteunt, heeft Streekomroep ZuidWest een alternatieve implementatie geschreven. 
 
 ## Over deze plugin
 
-De plugin voegt een REST API endpoint toe aan WordPress die artikelgegevens volgens de specificaties van het NLPO Dashboard beschikbaar stelt. De plugin haalt alle gepubliceerde aritkelen van het type post en de paginaweergaven van die artikelen uit Plausible Analytics. Vervolgens combineert deze het geheel tot één gestandaardiseerde output. Deze data wordt in het NLPO Dashboard gebruikt voor het rapporteren van het bereik van lokale/streekomroepen.
+De plugin voegt een REST API endpoint toe aan WordPress die artikelgegevens volgens de specificaties van het NLPO Dashboard beschikbaar stelt. De plugin haalt alle gepubliceerde artikelen van het type `post` en de paginaweergaven van die artikelen uit Plausible Analytics. Vervolgens combineert deze het geheel tot één gestandaardiseerde output. Deze data wordt in het NLPO Dashboard gebruikt voor het rapporteren van het bereik van lokale/streekomroepen.
 
 ## Installatie
 
@@ -26,7 +26,7 @@ Voor de werking van de plugin heb je de volgende gegevens nodig:
 - `NLPO_PLAUSIBLE_SITE_ID`: Het website ID in Plausible Analytics
 - `NLPO_PLAUSIBLE_TOKEN`: Een Plausible Analytics API token met leestoegang
 - `NLPO_API_TOKEN`: Een zelf gekozen beveiligingstoken voor de API toegang
-- `NLPO_CACHE_EXPIRATION`: Hoe lang statistieken gecacht worden in seconden (standaard: 3600)
+- `NLPO_CACHE_EXPIRATION`: Hoe lang statistieken gecached worden in seconden (standaard: 3600)
 
 ## Data structuur
 
@@ -43,7 +43,7 @@ De plugin levert artikeldata aan in het door NLPO gespecificeerde formaat:
         "author": "Redacteur Naam",
         "excerpt": "Artikel samenvatting...",
         "categories": ["Nieuws", "Lokaal"],
-        "tags": ["Regio1", "Regio2"],
+        "tags": ["Tag1", "Tag2"],
         "comment_count": 0,
         "views": 1234
     }
@@ -64,10 +64,14 @@ Parameters:
 - `from` (optioneel): Startdatum (YYYY-MM-DD)
 - `to` (optioneel): Einddatum (YYYY-MM-DD)
 
-Zonder datums worden artikelen van de laatste 7 dagen teruggegeven. Standaard wordt data uit Plausible Analytics een uur gecached om hammering van de de service te voorkomen.
+Zonder datums worden artikelen van de laatste 7 dagen teruggegeven. Standaard wordt data uit Plausible Analytics een uur gecached om hammering van de service te voorkomen.
 
-## Beperkingen
-De `comment_count` is altijd 0. Omdat ZuidWest niet met reacties werkt. Ook worden de tags standaard gevuld met de `regio` taxonomie uit WordPress. Dit omdat ZuidWest geen tags gebruikt, maar een custom taxonomie voor regio's.
+## Tags en regio's
+
+De plugin controleert of posts een 'regio' taxonomie hebben:
+- Als een post de 'regio' taxonomie heeft, worden deze termen gebruikt voor de 'tags' veld
+- Als een post geen 'regio' taxonomie heeft, worden de standaard WordPress tags gebruikt
+- Als beide niet beschikbaar zijn, wordt een lege array teruggegeven
 
 ## Licentie
 
@@ -76,7 +80,7 @@ Deze plugin is gelicenseerd onder de MIT licentie.
 ```
 MIT License
 
-Copyright (c) 2024 Streekomroep ZuidWest
+Copyright (c) 2025 Streekomroep ZuidWest
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
