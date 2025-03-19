@@ -346,17 +346,26 @@ class NLPO_API {
         $author_name = get_the_author_meta('display_name', $author_id);
         $author = !empty($author_name) ? $author_name : 'Onbekend';
         
-        // Categorieën en tags veilig ophalen
+        // Categorieën veilig ophalen
         $categories = [];
         $terms = get_the_category($post->ID);
         if (!is_wp_error($terms) && is_array($terms)) {
             $categories = wp_list_pluck($terms, 'name');
         }
         
-        $tags = [];
+        // Controleer of 'regio' taxonomie bestaat voor deze post
         $regio_terms = get_the_terms($post->ID, 'regio');
-        if (!is_wp_error($regio_terms) && is_array($regio_terms)) {
+        
+        // Als de regio taxonomie bestaat en geldig is, gebruik die
+        if (!is_wp_error($regio_terms) && is_array($regio_terms) && !empty($regio_terms)) {
             $tags = wp_list_pluck($regio_terms, 'name');
+        } 
+        // Anders gebruik de standaard post tags
+        else {
+            $post_tags = get_the_tags($post->ID);
+            $tags = (!is_wp_error($post_tags) && is_array($post_tags)) 
+                ? wp_list_pluck($post_tags, 'name') 
+                : [];
         }
         
         // Haal pageviews op met foutafhandeling
