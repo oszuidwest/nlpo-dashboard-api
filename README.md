@@ -1,10 +1,10 @@
-# NLPO Dashboard endpoint voor WordPress
+# NLPO Dashboard API-endpoint voor WordPress
 
-Deze WordPress plugin implementeert een REST API endpoint voor het aanleveren van artikeldata aan het [NLPO Bereiksdashboard](https://www.nlpo.nl/dashboard/). Omdat het dashboard standaard geen Plausible analytics ondersteunt, heeft Streekomroep ZuidWest een alternatieve implementatie geschreven. 
+Deze WordPress-plugin implementeert een REST API-endpoint voor het aanleveren van artikelgegevens aan het [NLPO Bereiksdashboard](https://www.nlpo.nl/dashboard/). Omdat het dashboard standaard geen Plausible Analytics ondersteunt, heeft Streekomroep ZuidWest een eigen implementatie ontwikkeld.
 
 ## Over deze plugin
 
-De plugin voegt een REST API endpoint toe aan WordPress die artikelgegevens volgens de specificaties van het NLPO Dashboard beschikbaar stelt. De plugin haalt alle gepubliceerde artikelen van het type `post` en de paginaweergaven van die artikelen uit Plausible Analytics. Vervolgens combineert deze het geheel tot één gestandaardiseerde output. Deze data wordt in het NLPO Dashboard gebruikt voor het rapporteren van het bereik van lokale/streekomroepen.
+De plugin voegt een REST API-endpoint toe aan WordPress dat artikelgegevens beschikbaar stelt volgens NLPO-specificaties. Het combineert gepubliceerde artikelen met paginaweergaven uit Plausible Analytics voor rapportages over het bereik van lokale- en streekomroepen.
 
 ## Installatie
 
@@ -20,17 +20,17 @@ De plugin voegt een REST API endpoint toe aan WordPress die artikelgegevens volg
 
 ## Configuratie
 
-Voor de werking van de plugin heb je de volgende gegevens nodig:
+Voor het functioneren van de plugin heb je de volgende gegevens nodig:
 
-- `NLPO_PLAUSIBLE_BASE_URL`: De URL van je Plausible Analytics installatie
-- `NLPO_PLAUSIBLE_SITE_ID`: Het website ID in Plausible Analytics
-- `NLPO_PLAUSIBLE_TOKEN`: Een Plausible Analytics API token met leestoegang
-- `NLPO_API_TOKEN`: Een zelf gekozen beveiligingstoken voor de API toegang
-- `NLPO_CACHE_EXPIRATION`: Hoe lang statistieken gecached worden in seconden (standaard: 3600)
+- `NLPO_PLAUSIBLE_BASE_URL`: De URL van je Plausible Analytics-installatie
+- `NLPO_PLAUSIBLE_SITE_ID`: Het website-ID in Plausible Analytics
+- `NLPO_PLAUSIBLE_TOKEN`: Een Plausible Analytics API-token met leestoegang
+- `NLPO_API_TOKEN`: Een zelf gekozen beveiligingstoken voor de API-toegang
+- `NLPO_CACHE_EXPIRATION`: Hoe lang statistieken in de cache worden bewaard in seconden (standaard: 3600)
 
-## Data structuur
+## Gegevensstructuur
 
-De plugin levert artikeldata aan in het door NLPO gespecificeerde formaat:
+De plugin levert artikelgegevens aan in het door NLPO gespecificeerde formaat:
 
 ```json
 [
@@ -50,32 +50,32 @@ De plugin levert artikeldata aan in het door NLPO gespecificeerde formaat:
 ]
 ```
 
-Deze implementatie-details zijn gebruikt: https://www.nlpo.nl/wp-content/uploads/2024/07/240711-PRD-_-Custom_API-v2-.pdf
+Deze implementatie is gebaseerd op deze specificaties: https://www.nlpo.nl/wp-content/uploads/2024/07/240711-PRD-_-Custom_API-v2-.pdf
 
 ## Technische informatie
 
-Het endpoint is beschikbaar op:
+Het endpoint is beschikbaar via:
 ```
-GET /wp-json/zw/v1/nlpo?token=jouw-api-token&from=2024-01-01&to=2024-01-31
+GET /wp-json/zw/v1/nlpo?token=jouw-api-token&from=2025-01-01&to=2025-01-31
 ```
 
 Parameters:
-- `token` (verplicht): Je API token
-- `from` (optioneel): Startdatum (YYYY-MM-DD)
-- `to` (optioneel): Einddatum (YYYY-MM-DD)
+- `token` (verplicht): Je API-token
+- `from` (optioneel): Startdatum (JJJJ-MM-DD)
+- `to` (optioneel): Einddatum (JJJJ-MM-DD)
 
-Zonder datums worden artikelen van de laatste 7 dagen teruggegeven. Standaard wordt data uit Plausible Analytics een uur gecached om hammering van de service te voorkomen.
+Zonder datumparameters worden artikelen van de afgelopen 7 dagen teruggegeven. Standaard worden gegevens uit Plausible Analytics één uur in de cache bewaard om overbelasting van de service te voorkomen.
 
 ## Tags en regio's
 
-De plugin controleert of posts een 'regio' taxonomie hebben:
-- Als een post de 'regio' taxonomie heeft, worden deze termen gebruikt voor de 'tags' veld
-- Als een post geen 'regio' taxonomie heeft, worden de standaard WordPress tags gebruikt
+De plugin controleert of berichten een 'regio'-taxonomie hebben:
+- Als een bericht de 'regio'-taxonomie heeft, worden deze termen gebruikt voor het 'tags'-veld
+- Als een bericht geen 'regio'-taxonomie heeft, worden de standaard WordPress-tags gebruikt
 - Als beide niet beschikbaar zijn, wordt een lege array teruggegeven
 
 ## Licentie
 
-Deze plugin is gelicenseerd onder de MIT licentie.
+Deze plugin is gelicenseerd onder de MIT-licentie.
 
 ```
 MIT License
