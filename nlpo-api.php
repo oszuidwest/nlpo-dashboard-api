@@ -2,8 +2,10 @@
 /**
  * Plugin Name: NLPO API Endpoint
  * Description: Implementeert een custom API endpoint voor het aanleveren van artikelen en traffic voor het NLPO Dashboard
- * Version: 0.0.4
+ * Version: 0.0.5
  * Author: Streekomroep ZuidWest
+ * License: MIT
+ * License URI: https://opensource.org/licenses/MIT
  * 
  * Endpoint: /wp-json/zw/v1/nlpo
  * Parameters:
@@ -34,8 +36,8 @@ define('NLPO_API_TOKEN', 'HELE-VEILIGE-TOKEN-HIER'); // Dit is de token die het 
  * @param array $context Extra context informatie
  */
 function nlpo_log_error($message, $context = []) {
-    $context_str = !empty($context) ? ' - Context: ' . json_encode($context) : '';
-    error_log('[NLPO API] ' . $message . $context_str);
+    $context_str = !empty($context) ? ' - Context: ' . wp_json_encode($context) : '';
+    error_log('[NLPO API] ' . esc_html($message) . $context_str);
 }
 
 /**
@@ -70,8 +72,8 @@ class NLPO_Analytics_Service {
         } catch (Exception $e) {
             nlpo_log_error(sprintf(
                 'Plausible Analytics fout voor %s: %s',
-                $page_path,
-                $e->getMessage()
+                esc_html($page_path),
+                esc_html($e->getMessage())
             ));
             throw $e;
         }
@@ -91,10 +93,10 @@ class NLPO_Analytics_Service {
         
         $url = sprintf(
             "%s/v1/stats/aggregate?site_id=%s&period=custom&date=%s,%s&filters=event:page==%s&metrics=pageviews",
-            NLPO_PLAUSIBLE_BASE_URL,
-            NLPO_PLAUSIBLE_SITE_ID,
-            '2020-01-01',
-            date('Y-m-d'),
+            esc_url_raw(NLPO_PLAUSIBLE_BASE_URL),
+            urlencode(NLPO_PLAUSIBLE_SITE_ID),
+            urlencode('2020-01-01'),
+            urlencode(date('Y-m-d')),
             urlencode($page_path)
         );
         
@@ -117,8 +119,8 @@ class NLPO_Analytics_Service {
             $error_message = isset($error_data['error']) ? $error_data['error'] : 'Onbekende fout';
             throw new Exception(sprintf(
                 'Plausible API gaf %d: %s', 
-                $response_code,
-                $error_message
+                intval($response_code),
+                esc_html($error_message)
             ));
         }
         
@@ -274,7 +276,7 @@ class NLPO_API {
                 try {
                     $articles[] = $this->format_article($post);
                 } catch (Exception $e) {
-                    nlpo_log_error('Fout bij formatteren artikel: ' . $e->getMessage(), [
+                    nlpo_log_error('Fout bij formatteren artikel: ' . esc_html($e->getMessage()), [
                         'post_id' => $post->ID
                     ]);
                     // Ga door met de volgende post, sla deze over
@@ -284,11 +286,11 @@ class NLPO_API {
             return rest_ensure_response($articles);
             
         } catch (Exception $e) {
-            nlpo_log_error('Fout in get_articles: ' . $e->getMessage());
+            nlpo_log_error('Fout in get_articles: ' . esc_html($e->getMessage()));
             
             return new WP_Error(
                 'rest_api_error',
-                'Interne server fout: ' . $e->getMessage(),
+                'Interne server fout: ' . esc_html($e->getMessage()),
                 ['status' => 500]
             );
         }
@@ -372,9 +374,9 @@ class NLPO_API {
         try {
             $views = $this->analytics->get_pageviews($url_path);
         } catch (Exception $e) {
-            nlpo_log_error('Kon pageviews niet ophalen: ' . $e->getMessage(), [
+            nlpo_log_error('Kon pageviews niet ophalen: ' . esc_html($e->getMessage()), [
                 'post_id' => $post->ID,
-                'url_path' => $url_path
+                'url_path' => esc_html($url_path)
             ]);
             $views = 0;
         }
@@ -383,12 +385,12 @@ class NLPO_API {
             'id' => strval($post->ID),
             'title' => html_entity_decode(get_the_title($post), ENT_QUOTES, 'UTF-8'),
             'text' => wp_strip_all_tags(get_the_content(null, false, $post)),
-            'url' => $permalink,
+            'url' => esc_url_raw($permalink),
             'date' => get_the_date('c', $post),
-            'author' => $author,
+            'author' => esc_html($author),
             'excerpt' => wp_strip_all_tags(get_the_excerpt($post)),
-            'categories' => $categories,
-            'tags' => $tags,
+            'categories' => array_map('esc_html', $categories),
+            'tags' => array_map('esc_html', $tags),
             'comment_count' => (int) $post->comment_count,
             'views' => $views
         ];

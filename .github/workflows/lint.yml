@@ -1,0 +1,37 @@
+name: Lint
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+jobs:
+  lint:
+    name: QA
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        php: ["8.2", "8.3"]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php }}
+          extensions: curl
+          coverage: none
+          tools: composer:v2, cs2pr
+
+      - name: Validate PHP syntax
+        run: find . -maxdepth 1 -name '*.php' -exec php --syntax-check {} +
+
+      - name: Run wp-plugin-check
+        uses: wordpress/plugin-check-action@v1
+        with:
+          exclude-checks: |
+            late_escaping
+            plugin_review_phpcs
+            file_type
+            plugin_readme
