@@ -8,9 +8,10 @@ De plugin voegt een REST API-endpoint toe aan WordPress dat artikelgegevens besc
 
 ## Installatie
 
-1. Download de pluginbestanden en plaats deze in `/wp-content/plugins/nlpo-api/`
-2. Activeer de plugin via WordPress
-3. Ga naar **Instellingen → NLPO API** om de plugin te configureren
+1. Download de laatste release van de [Releases-pagina](https://github.com/oszuidwest/nlpo-dashboard-api/releases)
+2. Upload het ZIP-bestand via **Plugins → Nieuwe plugin → Plugin uploaden** in WordPress
+3. Activeer de plugin
+4. Ga naar **Instellingen → NLPO API** om de plugin te configureren
 
 ## Configuratie
 

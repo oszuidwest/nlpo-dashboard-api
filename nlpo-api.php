@@ -2,7 +2,7 @@
 /**
  * Plugin Name: NLPO API Endpoint
  * Description: Implements a custom API endpoint for delivering articles and traffic for the NLPO Dashboard.
- * Version: 0.1.0
+ * Version: 0.1.1
  * Requires at least: 6.8
  * Requires PHP: 8.3
  * Author: Streekomroep ZuidWest
