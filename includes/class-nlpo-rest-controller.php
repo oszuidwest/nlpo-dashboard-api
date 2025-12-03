@@ -70,9 +70,10 @@ final class NLPO_REST_Controller {
 	 * @return true|WP_Error True for valid token, WP_Error for invalid or missing token.
 	 */
 	public function verify_token( WP_REST_Request $request ): true|WP_Error {
-		$token = $request->get_param( 'token' );
+		$token            = $request->get_param( 'token' );
+		$configured_token = NLPO_Settings::get( 'api_token' );
 
-		if ( ! defined( 'NLPO_API_TOKEN' ) || '' === NLPO_API_TOKEN ) {
+		if ( '' === $configured_token ) {
 			NLPO_Logger::error( 'API token not configured in the plugin' );
 
 			return new WP_Error(
@@ -82,7 +83,7 @@ final class NLPO_REST_Controller {
 			);
 		}
 
-		if ( NLPO_API_TOKEN !== $token ) {
+		if ( $configured_token !== $token ) {
 			NLPO_Logger::error( 'Access attempt with invalid token' );
 
 			return new WP_Error(
@@ -123,6 +124,14 @@ final class NLPO_REST_Controller {
 			$from_date  = is_string( $from_param ) && '' !== $from_param ? $from_param : gmdate( 'Y-m-d', strtotime( '-7 days' ) );
 			$to_date    = is_string( $to_param ) && '' !== $to_param ? $to_param : gmdate( 'Y-m-d' );
 
+			NLPO_Logger::debug(
+				'API request received',
+				[
+					'from' => $from_date,
+					'to'   => $to_date,
+				],
+			);
+
 			if ( strtotime( $from_date ) > strtotime( $to_date ) ) {
 				return new WP_Error(
 					'rest_invalid_date_range',
@@ -132,6 +141,8 @@ final class NLPO_REST_Controller {
 			}
 
 			$posts = $this->get_posts( $from_date, $to_date );
+
+			NLPO_Logger::debug( 'Posts retrieved', [ 'count' => count( $posts ) ] );
 
 			$page_data = [];
 			foreach ( $posts as $post ) {
@@ -149,6 +160,8 @@ final class NLPO_REST_Controller {
 
 			$all_pageviews = $this->plausible->fetch_pageviews_batch( array_values( $page_data ) );
 
+			NLPO_Logger::debug( 'Pageviews fetched', [ 'paths' => count( $all_pageviews ) ] );
+
 			$articles = [];
 			foreach ( $posts as $post ) {
 				try {
@@ -162,6 +175,8 @@ final class NLPO_REST_Controller {
 					);
 				}
 			}
+
+			NLPO_Logger::debug( 'Response prepared', [ 'articles' => count( $articles ) ] );
 
 			return rest_ensure_response( $articles );
 

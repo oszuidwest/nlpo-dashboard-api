@@ -14,12 +14,6 @@ parameters:
             message: '#generic class WP_REST_Request but does not specify its types#'
             paths:
                 - includes/class-nlpo-rest-controller.php
-        # PHPStan sees bootstrap constants but these are checked at runtime for flexibility.
-        -
-            message: '#Strict comparison using === between .+ and .+ will always evaluate to false#'
-            paths:
-                - includes/class-nlpo-rest-controller.php
-                - includes/class-nlpo-plausible-client.php
         # WP_Query::$posts returns int[]|WP_Post[] but without fields param it is always WP_Post[].
         -
             message: '#Method NLPO_REST_Controller::get_posts\(\) should return array<WP_Post> but returns array<int\|WP_Post>#'

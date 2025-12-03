@@ -36,7 +36,9 @@ final class NLPO_Plausible_Client {
 	 * @return array<string, int> Associative array of page_path => pageviews.
 	 */
 	public function fetch_pageviews_batch( array $page_data ): array {
-		if ( '' === NLPO_PLAUSIBLE_TOKEN ) {
+		$plausible_token = NLPO_Settings::get( 'plausible_token' );
+
+		if ( '' === $plausible_token ) {
 			NLPO_Logger::error( 'Plausible API token not configured' );
 			return array_fill_keys( array_column( $page_data, 'path' ), 0 );
 		}
@@ -49,11 +51,25 @@ final class NLPO_Plausible_Client {
 			static fn( array $item ): bool => ! isset( $all_pageviews[ $item['path'] ] ),
 		);
 
-		if ( [] !== $uncached ) {
-			$fetched       = $this->fetch_parallel( $uncached );
-			$all_pageviews = [ ...$all_pageviews, ...$fetched ];
+		$cached_count   = count( $page_data ) - count( $uncached );
+		$uncached_count = count( $uncached );
 
-			set_transient( self::CACHE_KEY, $all_pageviews, NLPO_CACHE_EXPIRATION );
+		NLPO_Logger::debug(
+			'Plausible cache status',
+			[
+				'cached'   => $cached_count,
+				'uncached' => $uncached_count,
+			],
+		);
+
+		if ( [] !== $uncached ) {
+			$fetched        = $this->fetch_parallel( $uncached );
+			$all_pageviews  = [ ...$all_pageviews, ...$fetched ];
+			$cache_duration = (int) NLPO_Settings::get( 'cache_expiration' );
+
+			set_transient( self::CACHE_KEY, $all_pageviews, $cache_duration );
+
+			NLPO_Logger::debug( 'Plausible API requests completed', [ 'fetched' => count( $fetched ) ] );
 		}
 
 		$results = [];
@@ -92,14 +108,18 @@ final class NLPO_Plausible_Client {
 		$requests = [];
 		$results  = [];
 
+		$base_url = (string) NLPO_Settings::get( 'plausible_base_url' );
+		$site_id  = (string) NLPO_Settings::get( 'plausible_site_id' );
+		$token    = (string) NLPO_Settings::get( 'plausible_token' );
+
 		foreach ( $page_data as $item ) {
 			$path      = $item['path'];
 			$from_date = $item['date'];
 
 			$url = sprintf(
 				'%s/v1/stats/aggregate?site_id=%s&period=custom&date=%s,%s&filters=event:page==%s&metrics=pageviews',
-				rtrim( NLPO_PLAUSIBLE_BASE_URL, '/' ),
-				rawurlencode( NLPO_PLAUSIBLE_SITE_ID ),
+				rtrim( $base_url, '/' ),
+				rawurlencode( $site_id ),
 				$from_date,
 				gmdate( 'Y-m-d' ),
 				rawurlencode( $path ),
@@ -108,7 +128,7 @@ final class NLPO_Plausible_Client {
 			$requests[ $path ] = [
 				'url'     => $url,
 				'headers' => [
-					'Authorization' => 'Bearer ' . NLPO_PLAUSIBLE_TOKEN,
+					'Authorization' => 'Bearer ' . $token,
 				],
 			];
 		}

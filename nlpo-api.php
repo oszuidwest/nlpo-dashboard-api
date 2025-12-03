@@ -23,20 +23,12 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-/**
- * Plugin configuration constants.
- * These values should be adjusted for different environments.
- */
-define( 'NLPO_PLAUSIBLE_BASE_URL', 'https://plausible.local/api' );
-define( 'NLPO_PLAUSIBLE_SITE_ID', 'website.com' );
-define( 'NLPO_PLAUSIBLE_TOKEN', 'XXXXXXXX' );
-define( 'NLPO_CACHE_EXPIRATION', 7200 ); // Cache duration in seconds.
-define( 'NLPO_API_TOKEN', 'XXXXX-XXXXX-XXXXX--XXXXX' ); // This is the token that secures the endpoint so not everyone can access the data.
-
 require_once plugin_dir_path( __FILE__ ) . 'includes/class-nlpo-logger.php';
+require_once plugin_dir_path( __FILE__ ) . 'includes/class-nlpo-settings.php';
 require_once plugin_dir_path( __FILE__ ) . 'includes/class-nlpo-plausible-client.php';
 require_once plugin_dir_path( __FILE__ ) . 'includes/class-nlpo-rest-controller.php';
 
+new NLPO_Settings();
 new NLPO_REST_Controller();
 
 register_activation_hook(
