@@ -1,0 +1,57 @@
+<?xml version="1.0"?>
+<ruleset name="NLPO API Coding Standards">
+    <description>Coding standards for NLPO Dashboard API WordPress plugin</description>
+
+    <!-- Scan these files -->
+    <file>.</file>
+
+    <!-- Exclude paths -->
+    <exclude-pattern>*/vendor/*</exclude-pattern>
+
+    <!-- Arguments -->
+    <arg value="sp"/>
+    <arg name="basepath" value="."/>
+    <arg name="colors"/>
+    <arg name="extensions" value="php"/>
+    <arg name="parallel" value="8"/>
+
+    <!-- PHP version: require 8.3+ -->
+    <config name="testVersion" value="8.3-"/>
+
+    <!-- Rules -->
+    <rule ref="WordPress-Core"/>
+    <rule ref="WordPress-Docs"/>
+    <rule ref="WordPress-Extra"/>
+    <rule ref="WordPress.WP.I18n"/>
+    <rule ref="PHPCompatibilityWP"/>
+
+    <!-- Allow short array syntax (modern PHP standard) -->
+    <rule ref="Generic.Arrays.DisallowShortArraySyntax.Found">
+        <severity>0</severity>
+    </rule>
+    <rule ref="Universal.Arrays.DisallowShortArraySyntax.Found">
+        <severity>0</severity>
+    </rule>
+
+    <!-- Configure text domain -->
+    <rule ref="WordPress.WP.I18n">
+        <properties>
+            <property name="text_domain" type="array">
+                <element value="nlpo-api"/>
+            </property>
+        </properties>
+    </rule>
+
+    <!-- Configure prefixes -->
+    <rule ref="WordPress.NamingConventions.PrefixAllGlobals">
+        <properties>
+            <property name="prefixes" type="array">
+                <element value="nlpo"/>
+                <element value="NLPO"/>
+            </property>
+        </properties>
+    </rule>
+
+    <!-- Minimum supported WordPress version -->
+    <config name="minimum_supported_wp_version" value="6.2"/>
+</ruleset>

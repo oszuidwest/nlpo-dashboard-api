@@ -1,1 +1,23 @@
+# Dependencies
+/vendor/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# OS
 .DS_Store
+Thumbs.db
+
+# Package managers
+composer.lock
+
+# Build / Testing
+*.log
+.phpunit.result.cache
+
+# AI assistant files
+CLAUDE.md
