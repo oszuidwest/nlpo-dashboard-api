@@ -66,7 +66,7 @@ final class NLPO_Settings {
 
 		$message = sprintf(
 			/* translators: 1: list of missing settings, 2: settings page URL */
-			__( 'NLPO API: The following settings are not configured: %1$s. <a href="%2$s">Configure now</a>.', 'nlpo-api' ),
+			__( 'NLPO API: De volgende instellingen zijn niet geconfigureerd: %1$s. <a href="%2$s">Nu configureren</a>.', 'nlpo-api' ),
 			implode( ', ', $missing ),
 			esc_url( admin_url( 'options-general.php?page=' . self::PAGE_SLUG ) ),
 		);
@@ -89,10 +89,10 @@ final class NLPO_Settings {
 	private function get_missing_configuration(): array {
 		$missing  = [];
 		$required = [
-			'api_token'          => __( 'Endpoint Token', 'nlpo-api' ),
-			'plausible_base_url' => __( 'Plausible Base URL', 'nlpo-api' ),
-			'plausible_site_id'  => __( 'Plausible Site ID', 'nlpo-api' ),
-			'plausible_token'    => __( 'Plausible API Token', 'nlpo-api' ),
+			'api_token'          => __( 'Endpoint-token', 'nlpo-api' ),
+			'plausible_base_url' => __( 'Plausible API-URL', 'nlpo-api' ),
+			'plausible_site_id'  => __( 'Plausible site-ID', 'nlpo-api' ),
+			'plausible_token'    => __( 'Plausible API-token', 'nlpo-api' ),
 		];
 
 		foreach ( $required as $key => $label ) {
@@ -112,7 +112,7 @@ final class NLPO_Settings {
 	 */
 	public function add_settings_page(): void {
 		add_options_page(
-			__( 'NLPO API Settings', 'nlpo-api' ),
+			__( 'NLPO API Instellingen', 'nlpo-api' ),
 			__( 'NLPO API', 'nlpo-api' ),
 			'manage_options',
 			self::PAGE_SLUG,
@@ -145,17 +145,17 @@ final class NLPO_Settings {
 
 		add_settings_section(
 			'nlpo_api_section',
-			__( 'API Settings', 'nlpo-api' ),
+			__( 'API-instellingen', 'nlpo-api' ),
 			$this->render_api_section( ... ),
 			self::PAGE_SLUG,
 		);
 
-		$this->add_field( 'plausible_base_url', __( 'Plausible Base URL', 'nlpo-api' ), 'nlpo_plausible_section', 'url' );
-		$this->add_field( 'plausible_site_id', __( 'Site ID', 'nlpo-api' ), 'nlpo_plausible_section', 'text' );
-		$this->add_field( 'plausible_token', __( 'API Token', 'nlpo-api' ), 'nlpo_plausible_section', 'password' );
-		$this->add_field( 'api_token', __( 'Endpoint Token', 'nlpo-api' ), 'nlpo_api_section', 'password' );
-		$this->add_field( 'cache_expiration', __( 'Cache Duration (seconds)', 'nlpo-api' ), 'nlpo_api_section', 'number' );
-		$this->add_field( 'debug_mode', __( 'Debug Mode', 'nlpo-api' ), 'nlpo_api_section', 'checkbox' );
+		$this->add_field( 'plausible_base_url', __( 'Plausible API-URL', 'nlpo-api' ), 'nlpo_plausible_section', 'url' );
+		$this->add_field( 'plausible_site_id', __( 'Site-ID', 'nlpo-api' ), 'nlpo_plausible_section', 'text' );
+		$this->add_field( 'plausible_token', __( 'API-token', 'nlpo-api' ), 'nlpo_plausible_section', 'password' );
+		$this->add_field( 'api_token', __( 'Endpoint-token', 'nlpo-api' ), 'nlpo_api_section', 'password' );
+		$this->add_field( 'cache_expiration', __( 'Cacheduur (seconden)', 'nlpo-api' ), 'nlpo_api_section', 'number' );
+		$this->add_field( 'debug_mode', __( 'Debug-modus', 'nlpo-api' ), 'nlpo_api_section', 'checkbox' );
 	}
 
 	/**
@@ -183,7 +183,7 @@ final class NLPO_Settings {
 	 * @return void
 	 */
 	public function render_plausible_section(): void {
-		echo '<p>' . esc_html__( 'Configure your Plausible Analytics connection for pageview tracking.', 'nlpo-api' ) . '</p>';
+		echo '<p>' . esc_html__( 'Configureer je Plausible Analytics-verbinding voor het ophalen van statistieken.', 'nlpo-api' ) . '</p>';
 	}
 
 	/**
@@ -192,7 +192,7 @@ final class NLPO_Settings {
 	 * @return void
 	 */
 	public function render_api_section(): void {
-		echo '<p>' . esc_html__( 'Configure the NLPO API endpoint settings.', 'nlpo-api' ) . '</p>';
+		echo '<p>' . esc_html__( 'Configureer de NLPO API endpoint-instellingen.', 'nlpo-api' ) . '</p>';
 	}
 
 	/**
@@ -263,7 +263,7 @@ final class NLPO_Settings {
 	 */
 	private function render_checkbox_label( string $id ): void {
 		$labels = [
-			'debug_mode' => __( 'Enable debug logging to PHP error log', 'nlpo-api' ),
+			'debug_mode' => __( 'Debuglogging naar de PHP-errorlog inschakelen', 'nlpo-api' ),
 		];
 
 		if ( isset( $labels[ $id ] ) ) {
@@ -279,11 +279,11 @@ final class NLPO_Settings {
 	 */
 	private function render_field_description( string $id ): void {
 		$descriptions = [
-			'plausible_base_url' => __( 'The base URL of your Plausible instance (e.g., https://plausible.io/api)', 'nlpo-api' ),
-			'plausible_site_id'  => __( 'Your website ID in Plausible Analytics', 'nlpo-api' ),
-			'plausible_token'    => __( 'Plausible API token with read access', 'nlpo-api' ),
-			'api_token'          => __( 'Token to secure the NLPO endpoint', 'nlpo-api' ),
-			'cache_expiration'   => __( 'How long to cache pageview data (default: 3600)', 'nlpo-api' ),
+			'plausible_base_url' => __( 'De API-URL van je Plausible-installatie (bijv. https://plausible.io/api)', 'nlpo-api' ),
+			'plausible_site_id'  => __( 'Je website-ID in Plausible Analytics', 'nlpo-api' ),
+			'plausible_token'    => __( 'Plausible API-token met leestoegang', 'nlpo-api' ),
+			'api_token'          => __( 'Token om het NLPO-endpoint te beveiligen', 'nlpo-api' ),
+			'cache_expiration'   => __( 'Tijd in seconden dat data gecachet blijft (standaard: 3600)', 'nlpo-api' ),
 		];
 
 		if ( isset( $descriptions[ $id ] ) ) {
@@ -372,14 +372,14 @@ final class NLPO_Settings {
 			<h2><?php esc_html_e( 'Status', 'nlpo-api' ); ?></h2>
 			<table class="form-table">
 				<tr>
-					<th scope="row"><?php esc_html_e( 'Cached Pageviews', 'nlpo-api' ); ?></th>
+					<th scope="row"><?php esc_html_e( 'Gecachete data-items', 'nlpo-api' ); ?></th>
 					<td><?php echo esc_html( (string) $this->get_cache_count() ); ?></td>
 				</tr>
 			</table>
 			<hr />
-			<h2><?php esc_html_e( 'Endpoint Information', 'nlpo-api' ); ?></h2>
+			<h2><?php esc_html_e( 'Endpoint-informatie', 'nlpo-api' ); ?></h2>
 			<p>
-				<strong><?php esc_html_e( 'Endpoint URL:', 'nlpo-api' ); ?></strong><br />
+				<strong><?php esc_html_e( 'Endpoint-URL:', 'nlpo-api' ); ?></strong><br />
 				<code><?php echo esc_url( rest_url( 'zw/v1/nlpo' ) ); ?>?token=YOUR_TOKEN&amp;from=YYYY-MM-DD&amp;to=YYYY-MM-DD</code>
 			</p>
 		</div>

@@ -9,24 +9,22 @@ De plugin voegt een REST API-endpoint toe aan WordPress dat artikelgegevens besc
 ## Installatie
 
 1. Download de pluginbestanden en plaats deze in `/wp-content/plugins/nlpo-api/`
-2. Activeer de plugin via WordPress 
-3. Configureer de vereiste instellingen in het plugin-bestand:
-   ```php
-   define('NLPO_PLAUSIBLE_BASE_URL', 'jouw-plausible-url/api');
-   define('NLPO_PLAUSIBLE_SITE_ID', 'jouw-site-id');
-   define('NLPO_PLAUSIBLE_TOKEN', 'jouw-plausible-token');
-   define('NLPO_API_TOKEN', 'jouw-beveiligde-api-token');
-   ```
+2. Activeer de plugin via WordPress
+3. Ga naar **Instellingen → NLPO API** om de plugin te configureren
 
 ## Configuratie
 
-Voor het functioneren van de plugin heb je de volgende gegevens nodig:
+De plugin wordt geconfigureerd via de WordPress admin onder **Instellingen → NLPO API**. De volgende instellingen zijn beschikbaar:
 
-- `NLPO_PLAUSIBLE_BASE_URL`: De URL van je Plausible Analytics-installatie
-- `NLPO_PLAUSIBLE_SITE_ID`: Het website-ID in Plausible Analytics
-- `NLPO_PLAUSIBLE_TOKEN`: Een Plausible Analytics API-token met leestoegang
-- `NLPO_API_TOKEN`: Een zelf gekozen beveiligingstoken voor de API-toegang
-- `NLPO_CACHE_EXPIRATION`: Hoe lang statistieken in de cache worden bewaard in seconden (standaard: 3600)
+### Plausible Analytics
+- **Plausible API-URL**: De API-URL van je Plausible-installatie (bijv. `https://plausible.io/api`)
+- **Site-ID**: Het website-ID in Plausible Analytics
+- **API-token**: Een Plausible API-token met leestoegang
+
+### API-instellingen
+- **Endpoint-token**: Een zelf gekozen token om het NLPO-endpoint te beveiligen
+- **Cacheduur**: Hoe lang data gecachet blijft in seconden (standaard: 3600)
+- **Debug-modus**: Schakel uitgebreide logging naar de PHP-errorlog in
 
 ## Gegevensstructuur
 
