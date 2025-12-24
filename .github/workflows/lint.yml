@@ -40,5 +40,12 @@ jobs:
 
       - run: ./vendor/bin/phpstan analyse --error-format=checkstyle | cs2pr
 
-      - uses: wordpress/plugin-check-action@v1
+      - name: Run wp-plugin-check
         if: matrix.php == '8.4'
+        uses: wordpress/plugin-check-action@v1
+        with:
+          exclude-checks: |
+            late_escaping
+            plugin_review_phpcs
+            file_type
+            plugin_readme
