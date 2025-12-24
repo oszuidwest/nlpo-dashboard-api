@@ -98,7 +98,7 @@ jobs:
 
       - name: Set Plugin Name
         run: |
-          PLUGIN_NAME="nlpo-api"
+          PLUGIN_NAME="nlpo-dashboard-api"
           echo "PLUGIN_NAME=$PLUGIN_NAME" >> $GITHUB_ENV
 
       - name: Create Zip Package

@@ -8,6 +8,7 @@
  * Author: Streekomroep ZuidWest
  * License: MIT
  * License URI: https://opensource.org/licenses/MIT
+ * Text Domain: nlpo-dashboard-api
  *
  * Endpoint: /wp-json/zw/v1/nlpo
  * Parameters:
