@@ -39,3 +39,6 @@ jobs:
       - run: vendor/bin/phpcs -q --report=checkstyle | cs2pr
 
       - run: ./vendor/bin/phpstan analyse --error-format=checkstyle | cs2pr
+
+      - uses: wordpress/plugin-check-action@v1
+        if: matrix.php == '8.4'
