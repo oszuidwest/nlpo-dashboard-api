@@ -6,8 +6,9 @@
  * Requires at least: 6.8
  * Requires PHP: 8.3
  * Author: Streekomroep ZuidWest
- * License: MIT
- * License URI: https://opensource.org/licenses/MIT
+ * Author URI: https://www.zuidwesttv.nl
+ * License: GPL-2.0-or-later
+ * License URI: https://www.gnu.org/licenses/gpl-2.0.html
  * Text Domain: nlpo-dashboard-api
  *
  * Endpoint: /wp-json/zw/v1/nlpo
