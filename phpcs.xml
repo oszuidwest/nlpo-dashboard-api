@@ -52,6 +52,6 @@
         </properties>
     </rule>
 
-    <!-- Minimum supported WordPress version -->
-    <config name="minimum_supported_wp_version" value="6.2"/>
+    <!-- Minimum supported WordPress version (matches plugin header) -->
+    <config name="minimum_supported_wp_version" value="6.8"/>
 </ruleset>

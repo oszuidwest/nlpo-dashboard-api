@@ -63,7 +63,8 @@ final class NLPO_Plausible_Client {
 		);
 
 		if ( [] !== $uncached ) {
-			$fetched        = $this->fetch_parallel( $uncached );
+			$fetched = $this->fetch_in_batches( $uncached );
+
 			$all_pageviews  = [ ...$all_pageviews, ...$fetched ];
 			$cache_duration = (int) NLPO_Settings::get( 'cache_expiration' );
 
@@ -81,18 +82,16 @@ final class NLPO_Plausible_Client {
 	}
 
 	/**
-	 * Executes parallel requests in batches.
+	 * Executes parallel requests in batches to avoid overwhelming the API.
 	 *
 	 * @param array<int, array{path: string, date: string}> $page_data Array of path and date pairs.
 	 * @return array<string, int> Associative array of page_path => pageviews.
 	 */
-	private function fetch_parallel( array $page_data ): array {
+	private function fetch_in_batches( array $page_data ): array {
 		$results = [];
-		$batches = array_chunk( $page_data, self::BATCH_SIZE );
 
-		foreach ( $batches as $batch ) {
-			$batch_results = $this->fetch_batch( $batch );
-			$results       = [ ...$results, ...$batch_results ];
+		foreach ( array_chunk( $page_data, self::BATCH_SIZE ) as $batch ) {
+			$results = [ ...$results, ...$this->fetch_batch( $batch ) ];
 		}
 
 		return $results;

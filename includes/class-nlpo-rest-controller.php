@@ -112,6 +112,20 @@ final class NLPO_REST_Controller {
 	}
 
 	/**
+	 * Gets a date parameter from the request with a fallback value.
+	 *
+	 * @param WP_REST_Request $request  The REST API request object.
+	 * @param string          $param    Parameter name.
+	 * @param string          $fallback Fallback value if parameter is empty.
+	 * @return string The date string.
+	 */
+	private function get_date_param( WP_REST_Request $request, string $param, string $fallback ): string {
+		$value = $request->get_param( $param );
+
+		return is_string( $value ) && '' !== $value ? $value : $fallback;
+	}
+
+	/**
 	 * Retrieves articles for the given date range.
 	 *
 	 * @param WP_REST_Request $request The REST API request object.
@@ -119,10 +133,8 @@ final class NLPO_REST_Controller {
 	 */
 	public function get_articles( WP_REST_Request $request ): WP_REST_Response|WP_Error {
 		try {
-			$from_param = $request->get_param( 'from' );
-			$to_param   = $request->get_param( 'to' );
-			$from_date  = is_string( $from_param ) && '' !== $from_param ? $from_param : gmdate( 'Y-m-d', strtotime( '-7 days' ) );
-			$to_date    = is_string( $to_param ) && '' !== $to_param ? $to_param : gmdate( 'Y-m-d' );
+			$from_date = $this->get_date_param( $request, 'from', gmdate( 'Y-m-d', strtotime( '-7 days' ) ) );
+			$to_date   = $this->get_date_param( $request, 'to', gmdate( 'Y-m-d' ) );
 
 			NLPO_Logger::debug(
 				'API request received',
@@ -232,7 +244,7 @@ final class NLPO_REST_Controller {
 
 		$permalink = get_permalink( $post );
 		if ( ! is_string( $permalink ) || '' === $permalink ) {
-			throw new Exception( 'Could not retrieve permalink for post ' . esc_html( (string) $post->ID ) );
+			throw new Exception( 'Could not retrieve permalink for post ' . (int) $post->ID );
 		}
 
 		$author_id   = (int) $post->post_author;

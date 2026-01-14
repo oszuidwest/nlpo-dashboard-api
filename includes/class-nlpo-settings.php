@@ -29,6 +29,20 @@ final class NLPO_Settings {
 	private const string PAGE_SLUG = 'nlpo-settings';
 
 	/**
+	 * Default values for settings.
+	 *
+	 * @var array<string, string|int|bool>
+	 */
+	private const array DEFAULTS = [
+		'plausible_base_url' => '',
+		'plausible_site_id'  => '',
+		'plausible_token'    => '',
+		'api_token'          => '',
+		'cache_expiration'   => 3600,
+		'debug_mode'         => false,
+	];
+
+	/**
 	 * Constructor.
 	 */
 	public function __construct() {
@@ -298,16 +312,7 @@ final class NLPO_Settings {
 	 * @return string|int|bool Default value.
 	 */
 	private function get_default( string $id ): string|int|bool {
-		$defaults = [
-			'plausible_base_url' => '',
-			'plausible_site_id'  => '',
-			'plausible_token'    => '',
-			'api_token'          => '',
-			'cache_expiration'   => 3600,
-			'debug_mode'         => false,
-		];
-
-		return $defaults[ $id ] ?? '';
+		return self::DEFAULTS[ $id ] ?? '';
 	}
 
 	/**
@@ -321,22 +326,17 @@ final class NLPO_Settings {
 			return [];
 		}
 
-		$sanitized = [];
+		$text_fields = [ 'plausible_site_id', 'plausible_token', 'api_token' ];
+		$sanitized   = [];
+
+		foreach ( $text_fields as $field ) {
+			if ( isset( $input[ $field ] ) ) {
+				$sanitized[ $field ] = sanitize_text_field( (string) $input[ $field ] );
+			}
+		}
 
 		if ( isset( $input['plausible_base_url'] ) ) {
 			$sanitized['plausible_base_url'] = esc_url_raw( rtrim( (string) $input['plausible_base_url'], '/' ) );
-		}
-
-		if ( isset( $input['plausible_site_id'] ) ) {
-			$sanitized['plausible_site_id'] = sanitize_text_field( (string) $input['plausible_site_id'] );
-		}
-
-		if ( isset( $input['plausible_token'] ) ) {
-			$sanitized['plausible_token'] = sanitize_text_field( (string) $input['plausible_token'] );
-		}
-
-		if ( isset( $input['api_token'] ) ) {
-			$sanitized['api_token'] = sanitize_text_field( (string) $input['api_token'] );
 		}
 
 		if ( isset( $input['cache_expiration'] ) ) {
@@ -404,20 +404,12 @@ final class NLPO_Settings {
 	 * @return string|int|bool Setting value or default.
 	 */
 	public static function get( string $key ): string|int|bool {
-		$options  = get_option( self::OPTION_NAME, [] );
-		$defaults = [
-			'plausible_base_url' => '',
-			'plausible_site_id'  => '',
-			'plausible_token'    => '',
-			'api_token'          => '',
-			'cache_expiration'   => 3600,
-			'debug_mode'         => false,
-		];
+		$options = get_option( self::OPTION_NAME, [] );
 
 		if ( is_array( $options ) && isset( $options[ $key ] ) ) {
 			return $options[ $key ];
 		}
 
-		return $defaults[ $key ] ?? '';
+		return self::DEFAULTS[ $key ] ?? '';
 	}
 }
