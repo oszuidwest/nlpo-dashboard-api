@@ -1,10 +1,8 @@
 parameters:
     level: max
     paths:
-        - nlpo-api.php
+        - nlpo-dashboard-api.php
         - includes/
-    bootstrapFiles:
-        - phpstan-bootstrap.php
     excludePaths:
         - vendor/
     treatPhpDocTypesAsCertain: false
