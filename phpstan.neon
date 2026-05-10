@@ -7,12 +7,8 @@ parameters:
         - vendor/
     treatPhpDocTypesAsCertain: false
     ignoreErrors:
-        # WP_REST_Request is a generic class but specifying types is not practical.
-        -
-            message: '#generic class WP_REST_Request but does not specify its types#'
-            paths:
-                - includes/class-nlpo-rest-controller.php
-        # WP_Query::$posts returns int[]|WP_Post[] but without fields param it is always WP_Post[].
+        # WP_Query::$posts is array<int|WP_Post>; without 'fields' set
+        # the runtime is always WP_Post[] but phpstan can't narrow.
         -
             message: '#Method NLPO_REST_Controller::get_posts\(\) should return array<WP_Post> but returns array<int\|WP_Post>#'
             paths:
