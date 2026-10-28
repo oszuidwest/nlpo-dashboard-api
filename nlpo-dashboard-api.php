@@ -4,7 +4,7 @@
  * Description: Implements a custom API endpoint for delivering articles and traffic for the NLPO Dashboard.
  * Version: 0.1.1
  * Requires at least: 7.0
- * Requires PHP: 8.3
+ * Requires PHP: 8.4
  * Author: Streekomroep ZuidWest
  * Author URI: https://www.zuidwesttv.nl
  * License: GPL-2.0-or-later
